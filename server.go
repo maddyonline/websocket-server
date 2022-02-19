@@ -12,12 +12,19 @@ func hello(c echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
 		defer ws.Close()
 		for {
-			msg := ""
-			err := websocket.Message.Receive(ws, &msg)
+			// Write
+			err := websocket.Message.Send(ws, "Hello, Client!")
 			if err != nil {
 				c.Logger().Error(err)
 			}
-			fmt.Printf("%s\n", msg)
+
+			// // Read
+			// msg := ""
+			// err = websocket.Message.Receive(ws, &msg)
+			// if err != nil {
+			// 	c.Logger().Error(err)
+			// }
+			fmt.Printf("Sent message\n")
 		}
 	}).ServeHTTP(c.Response(), c.Request())
 	return nil
@@ -27,8 +34,6 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Static("/", "../public")
 	e.GET("/ws", hello)
 	e.Logger.Fatal(e.Start(":1323"))
 }
-
